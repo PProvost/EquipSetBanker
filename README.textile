@@ -1,6 +1,6 @@
 h2. Overview
 
-Blah blah blah
+A simple way to manage equipment sets in your bank. More information coming soon.
 
 h2. Bugs and Suggestions
 
