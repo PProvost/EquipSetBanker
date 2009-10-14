@@ -4,6 +4,7 @@
 ## Author: Quaiche
 ## Version: Alpha
 ## X-Category: Misc
+## X-Credits: SetBanker by lordkarthas
 ## SavedVariables: EquipSetBankerDB
 ## SavedVariablesPerCharacter: EquipSetBankerDBPC
 ## OptionalDeps: tekDebug, tekErr

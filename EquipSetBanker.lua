@@ -61,72 +61,72 @@ local helpString = EquipSetBanker:CreateFontString(nil, "OVERLAY", "GameFontNorm
 helpString:SetPoint("BOTTOM", 0, 6)
 helpString:SetText("Click a set to move it\nto or from your bank.")
 
--- The next four functions were borrowed from SetBanker
+-- The next four functions were originally borrowed from SetBanker by lordkarthas
 local function FindEmptyBagSlot(num)
 	local count = 0;
 	for bag = 0, NUM_BAG_SLOTS do
-		local freeSlots, bagType = GetContainerNumFreeSlots(bag);
+		local freeSlots, bagType = GetContainerNumFreeSlots(bag)
 		if freeSlots > 0 and bagType == 0 then
 			for slot = 1, GetContainerNumSlots(bag) do
 				if not GetContainerItemInfo(bag, slot) then
 					if count >= num then
-						return bag, slot;
+						return bag, slot
 					else
-						count = count + 1;
+						count = count + 1
 					end
 				end
 			end
 		end
 	end
-	return nil, nil;
+	return nil, nil
 end
 
 local function FindEmptyBankSlot(num)
-	local count = 0;
+	local count = 0
 	if GetContainerNumFreeSlots(BANK_CONTAINER) > 0 then
 		for slot = 1, GetContainerNumSlots(BANK_CONTAINER) do
 			if not GetContainerItemInfo(BANK_CONTAINER, slot) then
 				if count >= num then
-					return BANK_CONTAINER, slot;
+					return BANK_CONTAINER, slot
 				else
-					count = count + 1;
+					count = count + 1
 				end
 			end
 		end
 	end
 	for bag = NUM_BAG_SLOTS + 1, NUM_BAG_SLOTS + NUM_BANKBAGSLOTS do
-		local freeSlots, bagType = GetContainerNumFreeSlots(bag);
+		local freeSlots, bagType = GetContainerNumFreeSlots(bag)
 		if freeSlots > 0 and bagType == 0 then
 			for slot = 1, GetContainerNumSlots(bag) do
 				if not GetContainerItemInfo(bag, slot) then
 					if count >= num then
-						return bag, slot;
+						return bag, slot
 					else
-						count = count + 1;
+						count = count + 1
 					end
 				end
 			end
 		end
 	end
-	return nil, nil;
+	return nil, nil
 end
 
 local function Withdraw(name)
-	local setLocs = GetEquipmentSetLocations(name);
-	local numSlots = 0;
+	local setLocs = GetEquipmentSetLocations(name)
+	local numSlots = 0
 	for slot, loc in pairs(setLocs) do
-		local player, bank, bags, srcSlot, srcBag = EquipmentManager_UnpackLocation(loc);
-		local destBag, destSlot = FindEmptyBagSlot(numSlots);
+		local player, bank, bags, srcSlot, srcBag = EquipmentManager_UnpackLocation(loc)
+		local destBag, destSlot = FindEmptyBagSlot(numSlots)
 		if bank and not bags and destBag and destSlot then
-			ClearCursor();
-			PickupInventoryItem(srcSlot);
-			PickupContainerItem(destBag, destSlot);
-			numSlots = numSlots + 1;
+			ClearCursor()
+			PickupInventoryItem(srcSlot)
+			PickupContainerItem(destBag, destSlot)
+			numSlots = numSlots + 1
 		elseif bank and bags and destBag and destSlot then
-			ClearCursor();
-			PickupContainerItem(srcBag, srcSlot);
-			PickupContainerItem(destBag, destSlot);
-			numSlots = numSlots + 1;
+			ClearCursor()
+			PickupContainerItem(srcBag, srcSlot)
+			PickupContainerItem(destBag, destSlot)
+			numSlots = numSlots + 1
 		end
 	end
 end
@@ -135,18 +135,18 @@ local function Deposit(name)
 	local setLocs = GetEquipmentSetLocations(name);
 	local numSlots = 0;
 	for slot, loc in pairs(setLocs) do
-		local player, bank, bags, srcSlot, srcBag = EquipmentManager_UnpackLocation(loc);
-		local destBag, destSlot = FindEmptyBankSlot(numSlots);
+		local player, bank, bags, srcSlot, srcBag = EquipmentManager_UnpackLocation(loc)
+		local destBag, destSlot = FindEmptyBankSlot(numSlots)
 		if player and not bags and destBag and destSlot then
-			ClearCursor();
-			PickupInventoryItem(srcSlot);
-			PickupContainerItem(destBag, destSlot);
-			numSlots = numSlots + 1;
+			ClearCursor()
+			PickupInventoryItem(srcSlot)
+			PickupContainerItem(destBag, destSlot)
+			numSlots = numSlots + 1
 		elseif bags and not bank and destBag and destSlot then
-			ClearCursor();
-			PickupContainerItem(srcBag, srcSlot);
-			PickupContainerItem(destBag, destSlot);
-			numSlots = numSlots + 1;
+			ClearCursor()
+			PickupContainerItem(srcBag, srcSlot)
+			PickupContainerItem(destBag, destSlot)
+			numSlots = numSlots + 1
 		end
 	end
 end
@@ -300,8 +300,6 @@ local function Refresh()
 end
 
 EquipSetBanker:SetScript("OnShow", Refresh)
-
---[[ Event Handlers ]]
 
 function EquipSetBanker:ADDON_LOADED(event, addon)
 	if addon:lower() ~= "equipsetbanker" then return end
