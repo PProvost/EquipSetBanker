@@ -1,6 +1,8 @@
 h2. Overview
 
-A simple way to manage equipment sets in your bank. More information coming soon.
+A simple way to manage equipment sets in your bank. Click a set in the lower frame and it will be moved into your bags. Click a set in the upper section and it will be moved to your bank.
+
+Note: Pieces that are contained in multiple sets will get moved when you move either set. So if you have a piece in two sets and you only want to move one set to the bank, you just do two moves... one to push the set you want and one to pull back those pieces you want to keep.
 
 h2. Bugs and Suggestions
 

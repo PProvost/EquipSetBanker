@@ -1,5 +1,26 @@
+--[[
+Copyright 2008 Quaiche
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+]]
+
 local L = setmetatable({}, {__index=function(t,i) return i end})
-local defaults, defaultsPC, db, dbpc = {}, {}
+local defaults, db = {
+	point = "CENTER",
+	relativePoint = "CENTER",
+	xOfs = 0,
+	yOfs = 0,
+}
 
 local function Print(...) print("|cFF33FF99EquipSetBanker|r:", ...) end
 local debugf = tekDebug and tekDebug:GetFrame("EquipSetBanker")
@@ -18,11 +39,14 @@ EquipSetBanker:SetBackdrop({bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 EquipSetBanker:SetBackdropColor(0,0,0,1);
 EquipSetBanker:SetWidth(214)
 EquipSetBanker:SetHeight(250)
-EquipSetBanker:SetPoint("TOP", UIParent, "TOP", 0, -20)
 EquipSetBanker:SetMovable(true)
+EquipSetBanker:SetPoint("CENTER", UIParent, "CENTER") -- just a temp location for now.
 EquipSetBanker:EnableMouse(true)
 EquipSetBanker:SetScript("OnMouseDown", function(self) self:StartMoving() end)
-EquipSetBanker:SetScript("OnMouseUp", function(self) self:StopMovingOrSizing() end)
+EquipSetBanker:SetScript("OnMouseUp", function(self) 
+	self:StopMovingOrSizing() 
+	db.point, _, db.relativePoint, db.xOfs, db.yOfs = this:GetPoint()
+end)
 
 local closeBtn = CreateFrame("Button", nil, EquipSetBanker, "UIPanelCloseButton")
 closeBtn:SetWidth(24); closeBtn:SetHeight(24);
@@ -37,24 +61,7 @@ local helpString = EquipSetBanker:CreateFontString(nil, "OVERLAY", "GameFontNorm
 helpString:SetPoint("BOTTOM", 0, 6)
 helpString:SetText("Click a set to move it\nto or from your bank.")
 
---[[
-local withdrawBtn = CreateFrame("Button", nil, EquipSetBanker, "UIPanelButtonTemplate")
-withdrawBtn:SetHighlightFontObject(GameFontHighlightSmall)
-withdrawBtn:SetNormalFontObject(GameFontNormalSmall)
-withdrawBtn:SetWidth(68); withdrawBtn:SetHeight(16)
-withdrawBtn:SetPoint("BOTTOMLEFT", EquipSetBanker, "BOTTOM", 1, 5)
-withdrawBtn:SetText("Withdraw")
-
-local depositBtn = CreateFrame("Button", nil, EquipSetBanker, "UIPanelButtonTemplate")
-depositBtn:SetHighlightFontObject(GameFontHighlightSmall)
-depositBtn:SetNormalFontObject(GameFontNormalSmall)
-depositBtn:SetWidth(68); depositBtn:SetHeight(16)
-depositBtn:SetPoint("BOTTOMRIGHT", EquipSetBanker, "BOTTOM", -1, 5)
-depositBtn:SetText("Deposit")
-]]
-
 -- The next four functions were borrowed from SetBanker
-
 local function FindEmptyBagSlot(num)
 	local count = 0;
 	for bag = 0, NUM_BAG_SLOTS do
@@ -246,10 +253,6 @@ end
 local inBagsSetButtons = MakeSection("Bag", "In Bags/Equipped", EquipSetBanker, "TOPLEFT", 12, -25)
 local inBankSetButtons = MakeSection("Bank", "In Bank", EquipSetBanker, "TOPLEFT", 12, -125)
 
---[[
-			local player, bank, bags, slot, bag = EquipmentManager_UnpackLocation(location)
-			player == true		if the 
---]]
 local function Refresh()
 	local bankedSets, availableSets = {}, {}
 	for index = 1,GetNumEquipmentSets() do
@@ -276,11 +279,9 @@ local function Refresh()
 			btn.name = availableSets[i].name
 			btn:SetTexture(availableSets[i].icon)
 			btn:SetText(availableSets[i].name)
-			-- if availableSets[i].partial then btn:SetPartial(true) end
 		else
 			btn.name = nil
 			btn:SetTexture("Interface/PaperDoll/UI-Backpack-EmptySlot")
-			-- btn:SetPartial(false)
 			btn:SetText("")
 		end
 	end
@@ -290,12 +291,10 @@ local function Refresh()
 			btn.name = bankedSets[i].name
 			btn:SetTexture(bankedSets[i].icon)
 			btn:SetText(bankedSets[i].name)
-			-- if bankedSets[i].partial then btn:SetPartial(true) end
 		else
 			btn.name = nil
 			btn:SetTexture("Interface/PaperDoll/UI-Backpack-EmptySlot")
 			btn:SetText("")
-			-- btn:SetPartial(false)
 		end
 	end
 end
@@ -307,16 +306,12 @@ EquipSetBanker:SetScript("OnShow", Refresh)
 function EquipSetBanker:ADDON_LOADED(event, addon)
 	if addon:lower() ~= "equipsetbanker" then return end
 
-	EquipSetBankerDB, EquipSetBankerDBPC = setmetatable(EquipSetBankerDB or {}, {__index = defaults}), setmetatable(EquipSetBankerDBPC or {}, {__index = defaultsPC})
-	db, dbpc = EquipSetBankerDB, EquipSetBankerDBPC
-
-	-- Do anything you need to do after addon has loaded
+	EquipSetBankerDB = setmetatable(EquipSetBankerDB or {}, {__index = defaults})
+	db = EquipSetBankerDB
 
 	LibStub("tekKonfig-AboutPanel").new(nil, "EquipSetBanker") -- Make first arg nil if no parent config panel
-
 	self:UnregisterEvent("ADDON_LOADED")
 	self.ADDON_LOADED = nil
-
 	if IsLoggedIn() then self:PLAYER_LOGIN() else self:RegisterEvent("PLAYER_LOGIN") end
 end
 
@@ -329,15 +324,15 @@ function EquipSetBanker:PLAYER_LOGIN()
 	self:RegisterEvent("UNIT_INVENTORY_CHANGED")
 	self:RegisterEvent("BAG_UPDATE")
 
+	-- Can't do this until we've got variables
+	self:SetPoint(db.point, UIParent, db.relativePoint, db.xOfs, db.yOfs)
+
 	self:UnregisterEvent("PLAYER_LOGIN")
 	self.PLAYER_LOGIN = nil
 end
 
 function EquipSetBanker:PLAYER_LOGOUT()
 	for i,v in pairs(defaults) do if db[i] == v then db[i] = nil end end
-	for i,v in pairs(defaultsPC) do if dbpc[i] == v then dbpc[i] = nil end end
-
-	-- Do anything you need to do as the player logs out
 end
 
 function EquipSetBanker:BANKFRAME_OPENED()
@@ -359,7 +354,7 @@ function EquipSetBanker:BAG_UPDATE(bagID)
 end
 
 --[[ Slash Command Registration ]]
-
+--[[
 SLASH_EQUIPSETBANKER1 = "/esb"
 SLASH_EQUIPSETBANKER2 = "/equipsetbanker"
 SlashCmdList.EQUIPSETBANKER = function(msg)
@@ -369,4 +364,4 @@ SlashCmdList.EQUIPSETBANKER = function(msg)
 		EquipSetBanker:Show()
 	end
 end
-
+]]
