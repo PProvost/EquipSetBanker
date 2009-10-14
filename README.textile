@@ -4,6 +4,10 @@ A simple way to manage equipment sets in your bank. Click a set in the lower fra
 
 Note: Pieces that are contained in multiple sets will get moved when you move either set. So if you have a piece in two sets and you only want to move one set to the bank, you just do two moves... one to push the set you want and one to pull back those pieces you want to keep.
 
+h2. Credits
+
+Thanks to lordkarthas for his excellent SetBanker from which the equipment movement code is derived.
+
 h2. Bugs and Suggestions
 
 Please post any bugs and suggestions on the CurseForge project page. Thanks!
