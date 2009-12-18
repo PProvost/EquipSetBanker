@@ -1,4 +1,4 @@
-## Interface: 30100
+## Interface: 30300
 ## Title: EquipSetBanker
 ## Notes: Easily push and pull equipment sets from your bank
 ## Author: Quaiche
@@ -9,7 +9,7 @@
 ## SavedVariablesPerCharacter: EquipSetBankerDBPC
 ## OptionalDeps: tekDebug, tekErr
 
-libs/LibStub.lua
-libs/tekKonfigAboutPanel.lua
+libs\LibStub.lua
+libs\tekKonfigAboutPanel.lua
 
 EquipSetBanker.lua
